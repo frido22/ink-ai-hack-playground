@@ -16,6 +16,7 @@ import './nonogram';
 import './queens';
 import './shape';
 import './sketchableimage';
+import './smartcanvas';
 import './stroke';
 import './sudoku';
 import './tango';

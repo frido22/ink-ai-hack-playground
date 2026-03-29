@@ -29,6 +29,7 @@ import type { RefinementMode } from './hooks/useSketchableImageGeneration';
 import { useNonogramGeneration } from './hooks/useNonogramGeneration';
 import { useJigsawGeneration } from './hooks/useJigsawGeneration';
 import { useColorConnectGeneration } from './hooks/useColorConnectGeneration';
+import { useSmartCanvasGeneration } from './hooks/useSmartCanvasGeneration';
 import { STYLE_PRESETS, DEFAULT_STYLE_PRESET } from './services/stylePresets';
 import type { StylePresetKey } from './services/stylePresets';
 import { detectRectangleX, lastRectXRejection, type RectangleXResult } from './geometry/rectangleXDetection';
@@ -99,6 +100,7 @@ function App() {
   useNonogramGeneration(currentNote, setCurrentNote);
   useJigsawGeneration(currentNote, setCurrentNote);
   useColorConnectGeneration(currentNote, setCurrentNote);
+  useSmartCanvasGeneration(currentNote, setCurrentNote);
 
   // Ref to always access the latest note state from async callbacks (avoids stale closures)
   const currentNoteRef = useRef(currentNote);

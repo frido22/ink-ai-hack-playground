@@ -3,6 +3,7 @@ import type { NoteElements, Element, Stroke, Brush } from '../types';
 import type { InkTextElement } from '../elements/inktext/types';
 import { hasActiveTransitions as hasActiveImageTransitions } from '../elements/sketchableimage/renderer';
 import { hasActiveTicTacToeAnimations } from '../elements/tictactoe/renderer';
+import { hasActiveSmartCanvasTransitions, hasActiveSmartCanvasVideos } from '../elements/smartcanvas/renderer';
 import type { Viewport } from './ViewportManager';
 import {
   DEFAULT_VIEWPORT,
@@ -398,7 +399,7 @@ export function InkCanvas({
     const hasGenerating = noteElements.elements.some(
       el => 'isGenerating' in el && (el as Record<string, unknown>).isGenerating === true
     );
-    if (hasActiveAnimations || hasGenerating || hasActiveImageTransitions() || hasActiveTicTacToeAnimations()) {
+    if (hasActiveAnimations || hasGenerating || hasActiveImageTransitions() || hasActiveTicTacToeAnimations() || hasActiveSmartCanvasTransitions() || hasActiveSmartCanvasVideos()) {
       animationFrameRef.current = requestAnimationFrame(render);
     }
   }, [noteElements, viewport, canvasSize, showDebugOverlay, animatingElements, animationDuration, getSizeMultiplier, onAnimationComplete, selectedElementIds]);
@@ -522,10 +523,11 @@ export function InkCanvas({
 
   // Start animation loop when animating elements change or elements are generating
   const hasGeneratingElements = noteElements.elements.some(
-    el => 'isGenerating' in el && (el as Record<string, unknown>).isGenerating === true
+    el => ('isGenerating' in el && (el as Record<string, unknown>).isGenerating === true)
+      || (el.type === 'smartCanvas' && (el.status === 'detecting' || el.status === 'generating'))
   );
   useEffect(() => {
-    const shouldAnimate = (animatingElements && animatingElements.size > 0) || hasGeneratingElements;
+    const shouldAnimate = (animatingElements && animatingElements.size > 0) || hasGeneratingElements || hasActiveSmartCanvasVideos();
     if (shouldAnimate) {
       // Cancel any existing animation frame
       if (animationFrameRef.current !== null) {
@@ -616,8 +618,6 @@ export function InkCanvas({
   // Handle mouse wheel for zoom and pan
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
-      e.preventDefault();
-
       if (e.ctrlKey || e.metaKey) {
         // Pinch zoom
         const zoomDelta = -e.deltaY * 0.003;
