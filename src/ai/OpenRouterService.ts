@@ -56,6 +56,10 @@ interface OpenRouterChatPayload {
   max_tokens?: number;
   response_format?: RestResponseFormat;
   modalities?: string[];
+  provider?: {
+    sort: 'price' | 'throughput' | 'latency';
+    allow_fallbacks?: boolean;
+  };
 }
 
 function getOpenRouterHeaders(): Record<string, string> {
@@ -129,6 +133,10 @@ async function postChatCompletion(
     model: options.model ?? DEFAULT_MODEL,
     messages: toRestMessages(messages),
     stream: false,
+    provider: {
+      sort: 'latency',
+      allow_fallbacks: true,
+    },
     ...extraPayload,
   };
 
@@ -147,6 +155,7 @@ async function postChatCompletion(
   console.log('[OpenRouter REST] sending chat completion', {
     model: payload.model,
     modalities: payload.modalities,
+    provider: payload.provider,
     responseFormat: payload.response_format?.type,
     messages: summarizeMessagesForLog(payload.messages),
   });

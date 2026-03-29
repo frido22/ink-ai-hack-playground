@@ -16,10 +16,10 @@ export async function enhanceDrawing(
       role: 'system',
       content:
         'You are refining an existing pencil sketch, not replacing it. ' +
-        'Preserve all original drawn objects, their positions, the composition, and the hand-drawn ink look. ' +
+        'Treat the input image as a locked reference. Preserve all original drawn objects, their positions, the composition, and the hand-drawn look. ' +
         'Treat handwritten instruction words and pointing arrows as edit annotations, not scene content. ' +
         'Do not erase or redesign the actual drawing. ' +
-        'For a generic improve/enhance request, make the upgrade visibly clear by cleaning linework, closing gaps, correcting obvious wobbles, and adding restrained pencil-style detail, graphite shading, or hatching that fits the existing sketch.',
+        'For a generic improve/enhance request, make only a light upgrade by cleaning linework, closing small gaps, correcting obvious wobbles, and adding restrained pencil-style detail or a little hatching that fits the existing sketch.',
     },
     {
       role: 'user',
@@ -31,17 +31,19 @@ export async function enhanceDrawing(
             `Enhance this hand-drawn sketch with focused instruction: "${instruction}". ` +
             'Preserve the original drawing exactly in spirit: keep the same subject, composition, layout, major shapes, and visible objects. ' +
             'This should feel like the same pencil drawing, only cleaner and more developed. ' +
-            'Refine the existing line work, structure, and shading in limited ways. ' +
+            'Refine the existing line work, structure, and shading in very limited ways. ' +
             'If the instruction points to a specific area, concentrate the enhancement there while keeping the rest consistent. ' +
             'Do not crop, zoom, reframe, or simplify away existing parts of the sketch. ' +
-            'Do NOT redesign the scene, replace objects, or invent unrelated content. ' +
+            'Do NOT redesign the scene, replace objects, invent unrelated content, or reinterpret the drawing. ' +
             'Do NOT make it photorealistic, painterly, or glossy. Keep a monochrome pencil-sketch look with hand-drawn graphite character. ' +
-            'You may add subtle detail only when it clearly supports what is already drawn. ' +
-            'Keep the background completely flat pure white with no paper texture, tint, shadow, vignette, or color wash. ' +
+            'Only add a small amount of new stroke detail when it clearly supports what is already drawn. ' +
+            'Every area that is blank white in the input should remain blank white in the output. ' +
+            'Keep the background completely flat pure white with no paper texture, tint, shadow, vignette, gradient, or color wash. ' +
+            'Do not add scenery, atmosphere, floor, sky, shading wash, or background elements. ' +
             'Remove any handwritten text instructions (like "improve" or "enhance") ' +
             'as those are commands, not part of the drawing. ' +
             'Do NOT include arrows or labels in the final image unless they are clearly part of the scene itself. ' +
-            'The output should look clearly improved but still recognizably be the same original drawing. ' +
+            'The output should look only slightly improved and still recognizably be the same original drawing. ' +
             'Return only the enhanced image.',
         },
       ],

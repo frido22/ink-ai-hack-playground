@@ -26,7 +26,7 @@ Rules:
 - For enhance or modify, use "instruction" to describe the intended focus area if arrows indicate one
 - For enhance with no specific target area, set "instruction" to "enhance the whole drawing"
 - For animate: if arrows are present, describe their direction relative to the objects they're on in "motionDescription"
-- For animate: if a duration is mentioned (e.g. "5 seconds", "4s"), use the closest valid value (4, 6, or 8). Default 8.
+- For animate: if a duration is mentioned (e.g. "5 seconds", "4s"), use the closest valid value (4, 6, or 8). Default 4.
 - Separate the DRAWING CONTENT from the INSTRUCTION TEXT. The instruction describes what to do, not what's drawn.
 - Be conservative: if unsure whether something is an instruction, return "none"
 

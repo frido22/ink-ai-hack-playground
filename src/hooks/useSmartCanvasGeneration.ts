@@ -230,18 +230,22 @@ export function useSmartCanvasGeneration(
                 rawInstruction.toLowerCase() !== 'animate' &&
                 rawInstruction.toLowerCase() !== 'animate the drawing'
               ? rawInstruction
-              : 'apply subtle natural motion that fits the scene while preserving the sketch';
+              : 'keep the drawing almost still with only tiny natural motion';
+        const durationSeconds =
+          intent.durationSeconds === 6 || intent.durationSeconds === 8
+            ? intent.durationSeconds
+            : 4;
 
         console.log('[SmartCanvas] Phase 2: animating...', motionDescription);
         debugLog.info('SmartCanvas: animating', {
           elementId: elementId.slice(0, 8),
           motionDescription,
-          durationSeconds: intent.durationSeconds || 8,
+          durationSeconds,
         });
         const result = await animateDrawing(
           compositeImage,
           motionDescription,
-          intent.durationSeconds || 8,
+          durationSeconds,
           controller.signal,
         );
         if (!isCurrentRequest()) return;

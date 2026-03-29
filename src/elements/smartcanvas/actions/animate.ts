@@ -11,7 +11,7 @@
 import { getOpenRouterApiKey } from '../../../ai/OpenRouterService';
 
 const OPENROUTER_BASE = 'https://openrouter.ai';
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 2500;
 const MAX_POLL_ATTEMPTS = 60; // 5 minutes max
 
 export interface AnimationResult {
@@ -27,6 +27,8 @@ export async function animateDrawing(
   signal: AbortSignal,
 ): Promise<AnimationResult> {
   const apiKey = getOpenRouterApiKey();
+  const safeDurationSeconds =
+    durationSeconds === 6 || durationSeconds === 8 ? durationSeconds : 4;
 
   const prompt =
     `Gently animate this hand-drawn sketch: ${motionDescription}. ` +
@@ -35,10 +37,13 @@ export async function animateDrawing(
     'Preserve the same subject, composition, framing, object layout, proportions, line placement, and line density. ' +
     'This should feel like the same pencil sketch brought slightly to life, not a new rendering or enhancement pass. ' +
     'Motion must be subtle, local, and minimal unless the instruction clearly asks for more. ' +
+    'Prefer almost-still motion. Small line movement is better than changing the drawing. ' +
     'Do not redraw the whole image, reinterpret the sketch, beautify it substantially, or add extra detail beyond what is needed for believable motion. ' +
     'Do not redesign the scene, replace objects, add background scenery, add lighting effects, or invent new content. ' +
-    'Keep the background completely flat pure white with no paper texture, tint, shadow, vignette, color wash, or environmental background. ' +
-    'Keep the output looking like monochrome pencil line art with light graphite shading. Do not make it photorealistic, painterly, cinematic, or glossy. ' +
+    'Every area that is blank white in the input must remain blank white in every frame. ' +
+    'Keep the background completely flat pure white with no paper texture, tint, shadow, vignette, gradient, color wash, or environmental background. ' +
+    'Do not add scenery, floor, sky, atmosphere, or any filled background behind the drawing. ' +
+    'Keep the output looking like monochrome pencil line art with only light graphite shading attached to the existing strokes. Do not make it photorealistic, painterly, cinematic, or glossy. ' +
     'Do not move the camera, zoom, reframe, or change perspective. ' +
     'If there is no clear motion target, prefer almost-still motion over inventing motion. ' +
     'Remove any handwritten text overlays or arrows because those are instructions, not part of the scene.';
@@ -57,7 +62,7 @@ export async function animateDrawing(
       prompt,
       // Send the image as a data URL — the alpha API should accept inline images
       image_url: compositeImageDataUrl,
-      duration: durationSeconds,
+      duration: safeDurationSeconds,
       aspect_ratio: '16:9',
     }),
     signal,
@@ -110,7 +115,7 @@ export async function animateDrawing(
 
       return {
         videoBlobUrl,
-        durationMs: durationSeconds * 1000,
+        durationMs: safeDurationSeconds * 1000,
         posterDataUrl: compositeImageDataUrl,
       };
     }

@@ -111,6 +111,7 @@ function App() {
 
   // Debounce buffer: collect strokes during debounce window before processing
   const strokeBufferRef = useRef<Stroke[]>([]);
+  const eagerSmartCanvasStrokeSetRef = useRef<Set<Stroke>>(new Set());
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Track elements with active stroke animations (element ID -> animation start time)
@@ -692,6 +693,7 @@ function App() {
     const immediateResult = await tryInteraction(currentNoteRef.current.elements, [stroke], undefined, /* isEagerInteraction */ true);
     if (immediateResult) {
       const { elementId, result } = immediateResult;
+      const consumedElement = currentNoteRef.current.elements.find((el) => el.id === elementId);
       debugLog.info('Immediate interaction consumed stroke', { elementId: elementId.slice(0, 8) });
       if (result.strokesConsumed.length > 0) {
         setStrokesToClearFromOverlay({ strokes: result.strokesConsumed, requestId: Date.now() });
@@ -704,7 +706,18 @@ function App() {
       });
       // Auto-select the element that consumed the stroke
       setSelectedElementIds(new Set([elementId]));
-      return;
+
+      if (consumedElement?.type !== 'smartCanvas') {
+        return;
+      }
+
+      /*
+       * SmartCanvas eagerly captures strokes so scribble erase does not steal
+       * handwritten commands. Keep a shadow copy of those strokes in the
+       * debounce buffer so multi-stroke global gestures like rectangle+X can
+       * still be recognized after the user has interacted with SmartCanvas.
+       */
+      eagerSmartCanvasStrokeSetRef.current.add(stroke);
     }
 
     // Add stroke to buffer
@@ -722,6 +735,39 @@ function App() {
       strokeBufferRef.current = [];
       debounceTimeoutRef.current = null;
       debugLog.info('Debounce timer FIRED — processing strokes', { count: strokesToProcess.length });
+
+      const allEagerSmartCanvasStrokes =
+        strokesToProcess.length > 0 &&
+        strokesToProcess.every((candidate) => eagerSmartCanvasStrokeSetRef.current.has(candidate));
+      for (const candidate of strokesToProcess) {
+        eagerSmartCanvasStrokeSetRef.current.delete(candidate);
+      }
+
+      if (allEagerSmartCanvasStrokes) {
+        debugLog.info('SmartCanvas eager stroke batch held for palette detection', {
+          count: strokesToProcess.length,
+        });
+
+        for (let windowSize = 3; windowSize <= Math.min(6, strokesToProcess.length); windowSize++) {
+          const window = strokesToProcess.slice(-windowSize);
+          const rectXResult = detectRectangleX(window);
+          if (!rectXResult) continue;
+
+          debugLog.info('Rectangle+X gesture detected from SmartCanvas batch', {
+            rectStrokes: rectXResult.rectangleStrokes.length,
+            totalStrokes: rectXResult.allStrokes.length,
+          });
+
+          const intent = createPaletteIntent(rectXResult);
+          if (intent.entries.length > 0) {
+            setPaletteIntent(intent);
+            return;
+          }
+        }
+
+        debugLog.info('Skipping global post-processing for SmartCanvas eager stroke batch');
+        return;
+      }
 
       // Check for scribble erase gesture BEFORE element assignment
       // This allows quick sequences of strokes (with brief stylus lifts) to qualify as scribble erase
