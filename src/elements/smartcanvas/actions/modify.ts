@@ -15,8 +15,8 @@ export async function modifyDrawing(
     {
       role: 'system',
       content:
-        'You are editing an existing pen sketch. Keep the original drawing intact except for the specific requested change. ' +
-        'Preserve the same composition, object placement, line quality, and hand-drawn ink style. ' +
+        'You are editing an existing pencil sketch. Keep the original drawing intact except for the specific requested change. ' +
+        'Preserve the same composition, object placement, line quality, and hand-drawn graphite style. ' +
         'Treat handwritten instructions and pointing arrows as annotations for what to change and where to change it.',
     },
     {
@@ -30,7 +30,7 @@ export async function modifyDrawing(
             'Keep the original drawing style, composition, major shapes, and scene structure. ' +
             'Apply only the requested change, and keep all other parts as close to the original as possible. ' +
             'If arrows indicate the target area, localize the change there instead of rewriting the whole image. ' +
-            'Do NOT make it photorealistic — maintain the hand-drawn pen sketch aesthetic. ' +
+            'Do NOT make it photorealistic — maintain the hand-drawn pencil sketch aesthetic. ' +
             'Keep the background completely flat pure white with no paper texture, tint, shadow, vignette, or color wash. ' +
             'Remove any handwritten text instructions from the image ' +
             'as those are commands, not part of the drawing. ' +

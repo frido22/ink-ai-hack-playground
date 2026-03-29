@@ -31,11 +31,11 @@ export async function animateDrawing(
   const prompt =
     `Gently animate this hand-drawn sketch: ${motionDescription}. ` +
     'Preserve the original drawing almost exactly: keep the same subject, composition, framing, object layout, proportions, and linework. ' +
-    'This should feel like the same pen sketch brought slightly to life, not a new rendering. ' +
+    'This should feel like the same pencil sketch brought slightly to life, not a new rendering. ' +
     'Motion must be subtle, local, and minimal unless the instruction clearly asks for more. ' +
     'Do not redesign the scene, replace objects, add background scenery, add lighting effects, or invent new content. ' +
     'Keep the background completely flat pure white with no paper texture, tint, shadow, vignette, color wash, or environmental background. ' +
-    'Keep the output looking monochrome pen or ink line art. Do not make it photorealistic, painterly, cinematic, or glossy. ' +
+    'Keep the output looking like monochrome pencil line art with light graphite shading. Do not make it photorealistic, painterly, cinematic, or glossy. ' +
     'Do not move the camera, zoom, reframe, or change perspective. ' +
     'Remove any handwritten text overlays or arrows because those are instructions, not part of the scene.';
 
